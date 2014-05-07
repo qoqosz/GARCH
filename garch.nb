@@ -1,0 +1,811 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     32832,        802]
+NotebookOptionsPosition[     31793,        767]
+NotebookOutlinePosition[     32150,        783]
+CellTagsIndexPosition[     32107,        780]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ StyleBox["GARCH(p, q)",
+  FontSize->24,
+  FontWeight->"Bold",
+  FontVariations->{"Underline"->True}],
+ "\n",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["\[Sigma]", "t"], TraditionalForm]]],
+ " = ",
+ Cell[BoxData[
+  FormBox[
+   SqrtBox[
+    RowBox[{"\[Omega]", "+", 
+     RowBox[{
+      SubscriptBox["a", "1"], 
+      SubsuperscriptBox["X", 
+       RowBox[{"t", "-", "1"}], "2"]}], "+", "\[Ellipsis]", "+", 
+     RowBox[{
+      SubscriptBox["a", "q"], 
+      SubsuperscriptBox["X", 
+       RowBox[{"t", "-", "q"}], "2"]}], "+", 
+     RowBox[{
+      SubscriptBox["b", "1"], 
+      SubsuperscriptBox["\[Sigma]", 
+       RowBox[{"t", "-", "1"}], "2"]}], "+", "\[Ellipsis]", "+", 
+     RowBox[{
+      SubscriptBox["b", "p"], 
+      SubsuperscriptBox["\[Sigma]", 
+       RowBox[{"t", "-", "p"}], "2"]}]}]], TraditionalForm]]],
+ "\n",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    RowBox[{
+     SubscriptBox["X", "t"], " ", "=", " ", 
+     RowBox[{
+      SubscriptBox["\[Sigma]", "t"], " ", 
+      SubscriptBox["Z", "t"]}]}], ",", " ", 
+    RowBox[{
+     SubscriptBox["Z", "t"], "\[Tilde]", 
+     RowBox[{"\[ScriptCapitalN]", "(", 
+      RowBox[{"0", ",", "1"}], ")"}]}]}], TraditionalForm]]]
+}], "Text",
+ CellChangeTimes->{{3.598979400639164*^9, 3.598979549902802*^9}, {
+   3.598979627467639*^9, 3.598979633363832*^9}, 3.598979983639758*^9, {
+   3.5992078247694073`*^9, 3.5992078984427557`*^9}, {3.599207937777733*^9, 
+   3.599207944647954*^9}},
+ TextAlignment->Center,
+ FontSize->16,
+ FontColor->RGBColor[
+  0.2494544899671931, 0.2494544899671931, 0.2494544899671931],
+ Background->RGBColor[0.87, 0.94, 1]],
+
+Cell[CellGroupData[{
+
+Cell["Kod", "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.598986478391021*^9, 3.598986498985083*^9}, {
+  3.59898665170024*^9, 3.59898666652149*^9}},
+ Background->RGBColor[1., 0.7680628671702144, 0.5930571450370031]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Wygenerowanie", " ", "szeregy", " ", "GARCH", 
+    RowBox[{"(", 
+     RowBox[{"p", ",", "q"}], ")"}], "\[IndentingNewLine]", "Szereg", " ", 
+    "jest", " ", "zwracany", " ", "w", " ", "postaci", " ", "listy"}], "*)"}],
+   "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"garchSeries", "[", 
+      RowBox[{
+      "w_", ",", " ", "a_List", ",", " ", "b_List", ",", " ", "n_Integer", 
+       ",", " ", "drop_Integer", ",", " ", "seed_Integer"}], "]"}], ":=", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Module", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"z", ",", " ", "data"}], "}"}], ",", "\[IndentingNewLine]", 
+       "\t", 
+       RowBox[{
+        RowBox[{"SeedRandom", "[", "seed", "]"}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"z", " ", "=", " ", 
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"RandomReal", "[", 
+            RowBox[{"NormalDistribution", "[", 
+             RowBox[{"0", ",", " ", "1"}], "]"}], "]"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", " ", "1", ",", " ", 
+             RowBox[{"n", " ", "+", " ", "drop"}]}], "}"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{
+         RowBox[{"getz", "[", "t_Integer", "]"}], ":=", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"t", " ", ">", " ", "0"}], ",", " ", 
+           RowBox[{"z", "[", 
+            RowBox[{"[", "t", "]"}], "]"}], ",", " ", "0"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{"data", " ", "=", " ", 
+         RowBox[{"{", "}"}]}], ";", "\[IndentingNewLine]", "\t", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"getsigma", "[", "]"}], " ", "zamiast", " ", "0", " ", 
+          "mo\:017ce", " ", 
+          RowBox[{"ew", ".", " ", "zwraca\[CAcute]"}], " ", "sigma0"}], 
+         "*)"}], "\[IndentingNewLine]", "\t", 
+        RowBox[{
+         RowBox[{"getsigma", "[", "t_Integer", "]"}], ":=", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"t", " ", ">", " ", "0"}], ",", " ", 
+           RowBox[{"data", "[", 
+            RowBox[{"[", "t", "]"}], "]"}], ",", " ", "0.0"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{
+         RowBox[{"G", "[", "t_Integer", "]"}], ":=", 
+         SqrtBox[
+          RowBox[{"w", "+", 
+           RowBox[{
+            UnderoverscriptBox["\[Sum]", 
+             RowBox[{"i", "=", "1"}], 
+             RowBox[{"Length", "[", "a", "]"}]], 
+            RowBox[{
+             RowBox[{"a", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], 
+             SuperscriptBox[
+              RowBox[{"getsigma", "[", 
+               RowBox[{"t", "-", "i"}], "]"}], "2"], 
+             SuperscriptBox[
+              RowBox[{"getz", "[", 
+               RowBox[{"t", "-", "i"}], "]"}], "2"]}]}], "+", 
+           RowBox[{
+            UnderoverscriptBox["\[Sum]", 
+             RowBox[{"j", "=", "1"}], 
+             RowBox[{"Length", "[", "b", "]"}]], 
+            RowBox[{
+             RowBox[{"b", "[", 
+              RowBox[{"[", "j", "]"}], "]"}], 
+             SuperscriptBox[
+              RowBox[{"getsigma", "[", 
+               RowBox[{"t", "-", "j"}], "]"}], "2"]}]}]}]]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{"For", "[", 
+         RowBox[{
+          RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+          RowBox[{"i", " ", "\[LessEqual]", " ", 
+           RowBox[{"n", " ", "+", " ", "drop"}]}], ",", " ", 
+          RowBox[{"i", "++"}], ",", " ", 
+          RowBox[{"AppendTo", "[", 
+           RowBox[{"data", ",", " ", 
+            RowBox[{
+             RowBox[{"G", "[", "i", "]"}], 
+             RowBox[{"z", "[", 
+              RowBox[{"[", "i", "]"}], "]"}]}]}], "]"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Drop", "[", 
+          RowBox[{"data", ",", " ", "drop"}], "]"}], "]"}], ";"}]}], 
+      "\[IndentingNewLine]", "]"}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Generuje", " ", "list\:0119", " ", "warto\:015bci", " ", "\[Sigma]"}], 
+    "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"sigmaSeries", "[", 
+      RowBox[{
+      "w_", ",", " ", "a_List", ",", " ", "b_List", ",", " ", "n_Integer", 
+       ",", " ", "drop_Integer", ",", " ", "seed_Integer"}], "]"}], ":=", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Module", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"z", ",", " ", "data"}], "}"}], ",", "\[IndentingNewLine]", 
+       "\t", 
+       RowBox[{
+        RowBox[{"SeedRandom", "[", "seed", "]"}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"z", " ", "=", " ", 
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"RandomReal", "[", 
+            RowBox[{"NormalDistribution", "[", 
+             RowBox[{"0", ",", " ", "1"}], "]"}], "]"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", " ", "1", ",", " ", 
+             RowBox[{"n", " ", "+", " ", "drop"}]}], "}"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{
+         RowBox[{"getz", "[", "t_Integer", "]"}], ":=", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"t", " ", ">", " ", "0"}], ",", " ", 
+           RowBox[{"z", "[", 
+            RowBox[{"[", "t", "]"}], "]"}], ",", " ", "0"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{"data", " ", "=", " ", 
+         RowBox[{"{", "}"}]}], ";", "\[IndentingNewLine]", "\t", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"getsigma", "[", "]"}], " ", "zamiast", " ", "0", " ", 
+          "mo\:017ce", " ", 
+          RowBox[{"ew", ".", " ", "zwraca\[CAcute]"}], " ", "sigma0"}], 
+         "*)"}], "\[IndentingNewLine]", "\t", 
+        RowBox[{
+         RowBox[{"getsigma", "[", "t_Integer", "]"}], ":=", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"t", " ", ">", " ", "0"}], ",", " ", 
+           RowBox[{"data", "[", 
+            RowBox[{"[", "t", "]"}], "]"}], ",", " ", "0.0"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{
+         RowBox[{"G", "[", "t_Integer", "]"}], ":=", 
+         SqrtBox[
+          RowBox[{"w", "+", 
+           RowBox[{
+            UnderoverscriptBox["\[Sum]", 
+             RowBox[{"i", "=", "1"}], 
+             RowBox[{"Length", "[", "a", "]"}]], 
+            RowBox[{
+             RowBox[{"a", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], 
+             SuperscriptBox[
+              RowBox[{"getsigma", "[", 
+               RowBox[{"t", "-", "i"}], "]"}], "2"], 
+             SuperscriptBox[
+              RowBox[{"getz", "[", 
+               RowBox[{"t", "-", "i"}], "]"}], "2"]}]}], "+", 
+           RowBox[{
+            UnderoverscriptBox["\[Sum]", 
+             RowBox[{"j", "=", "1"}], 
+             RowBox[{"Length", "[", "b", "]"}]], 
+            RowBox[{
+             RowBox[{"b", "[", 
+              RowBox[{"[", "j", "]"}], "]"}], 
+             SuperscriptBox[
+              RowBox[{"getsigma", "[", 
+               RowBox[{"t", "-", "j"}], "]"}], "2"]}]}]}]]}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{"For", "[", 
+         RowBox[{
+          RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+          RowBox[{"i", " ", "\[LessEqual]", " ", 
+           RowBox[{"n", " ", "+", " ", "drop"}]}], ",", " ", 
+          RowBox[{"i", "++"}], ",", " ", 
+          RowBox[{"AppendTo", "[", 
+           RowBox[{"data", ",", " ", 
+            RowBox[{"G", "[", "i", "]"}]}], "]"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", "\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Drop", "[", 
+          RowBox[{"data", ",", " ", "drop"}], "]"}], "]"}], ";"}]}], 
+      "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"Estymator", " ", "funkcji", " ", "autokorelacji"}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"acfEstimator", "[", "data_List", "]"}], ":=", 
+     RowBox[{"Module", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"n", ",", " ", "m", ",", " ", "acf"}], "}"}], ",", 
+       "\[IndentingNewLine]", "\t", 
+       RowBox[{
+        RowBox[{"n", " ", "=", " ", 
+         RowBox[{"Length", "[", "data", "]"}]}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"m", " ", "=", " ", 
+         RowBox[{"Mean", "[", "data", "]"}]}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"acf", " ", "=", " ", 
+         RowBox[{"Table", "[", "\[IndentingNewLine]", "\t\t", 
+          RowBox[{
+           RowBox[{
+            FractionBox["1", "n"], 
+            RowBox[{
+             UnderoverscriptBox["\[Sum]", 
+              RowBox[{"t", "=", "1"}], 
+              RowBox[{"n", "-", "k", "+", "1"}]], 
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"data", "[", 
+                 RowBox[{"[", "t", "]"}], "]"}], "-", "m"}], ")"}], 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"data", "[", 
+                 RowBox[{"[", 
+                  RowBox[{"t", "+", "k", "-", "1"}], "]"}], "]"}], "-", "m"}],
+                ")"}]}]}]}], ",", "\[IndentingNewLine]", "\t\t", 
+           RowBox[{"{", 
+            RowBox[{"k", ",", " ", "1", ",", " ", "n"}], "}"}]}], 
+          "\[IndentingNewLine]", "\t", "]"}]}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"Return", "[", 
+         FractionBox["acf", 
+          RowBox[{"acf", "[", 
+           RowBox[{"[", "1", "]"}], "]"}]], "]"}]}]}], "\[IndentingNewLine]", 
+      "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Funkcja", " ", "do", " ", "wizualizacji", " ", "uzyskanych", " ", 
+     "danych"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"visualizeGarch", "[", 
+      RowBox[{
+      "w_", ",", " ", "a_List", ",", " ", "b_List", ",", " ", "n_Integer", 
+       ",", " ", "drop_Integer", ",", " ", "seed_Integer", ",", " ", 
+       "view_"}], "]"}], ":=", "\[IndentingNewLine]", 
+     RowBox[{"Module", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"data", ",", " ", "acf", ",", " ", "sigma"}], "}"}], ",", 
+       "\[IndentingNewLine]", "\t", 
+       RowBox[{
+        RowBox[{"data", " ", "=", " ", 
+         RowBox[{"garchSeries", "[", 
+          RowBox[{
+          "w", ",", " ", "a", ",", " ", "b", ",", " ", "n", ",", " ", "drop", 
+           ",", " ", "seed"}], "]"}]}], ";", "\[IndentingNewLine]", "\t", 
+        RowBox[{"acf", " ", "=", " ", 
+         RowBox[{"acfEstimator", "[", "data", "]"}]}], ";", "\n", "\t", 
+        RowBox[{"sigma", " ", "=", " ", 
+         RowBox[{"acfEstimator", "[", 
+          RowBox[{"sigmaSeries", "[", 
+           RowBox[{
+           "w", ",", " ", "a", ",", " ", "b", ",", " ", "n", ",", " ", "drop",
+             ",", " ", "seed"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"Which", "[", "\[IndentingNewLine]", "\t\t", 
+         RowBox[{
+          RowBox[{"view", " ", "\[Equal]", " ", "\"\<garch\>\""}], ",", 
+          "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"ListPlot", "[", 
+           RowBox[{"data", ",", " ", 
+            RowBox[{"Joined", "\[Rule]", "True"}], ",", "\n", "\t\t\t", 
+            RowBox[{"PlotLabel", "\[Rule]", 
+             RowBox[{"Row", "[", 
+              RowBox[{"{", 
+               RowBox[{"\"\<GARCH(\>\"", ",", 
+                RowBox[{"Length", "[", "b", "]"}], ",", "\"\<,\>\"", ",", 
+                RowBox[{"Length", "[", "a", "]"}], ",", "\"\<)\>\""}], "}"}], 
+              "]"}]}], ",", "\[IndentingNewLine]", "\t\t\t", 
+            RowBox[{"PlotRange", "\[Rule]", "All"}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"view", " ", "\[Equal]", " ", "\"\<histogram\>\""}], ",", 
+          "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"Histogram", "[", 
+           RowBox[{"data", ",", " ", "20", ",", " ", 
+            RowBox[{"PlotLabel", "\[Rule]", "\"\<Histogram\>\""}]}], "]"}], 
+          ",", "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"view", " ", "\[Equal]", " ", "\"\<f.autokorelacji\>\""}], 
+          ",", "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"ListPlot", "[", 
+           RowBox[{"acf", ",", " ", 
+            RowBox[{"Filling", "\[Rule]", "Axis"}], ",", " ", 
+            RowBox[{"PlotLabel", "\[Rule]", "\"\<ACF\>\""}], ",", 
+            RowBox[{"FillingStyle", "\[Rule]", "Black"}]}], "]"}], ",", "\n", 
+          "\t\t", 
+          RowBox[{
+          "view", " ", "\[Equal]", " ", "\"\<f.autokorelacji \[Sigma]\>\""}], 
+          ",", "\n", "\t\t", 
+          RowBox[{"ListPlot", "[", 
+           RowBox[{"sigma", ",", " ", 
+            RowBox[{"Filling", "\[Rule]", "Axis"}], ",", " ", 
+            RowBox[{"FillingStyle", "\[Rule]", "Black"}], ",", " ", 
+            RowBox[{"PlotLabel", "\[Rule]", "\"\<\[Sigma] ACF\>\""}]}], 
+           "]"}]}], "\[IndentingNewLine]", "\t", "]"}]}]}], 
+      "\[IndentingNewLine]", "]"}]}], ";"}]}]}]], "Code",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.598960595131963*^9, 3.598961029714902*^9}, {
+   3.598961069861562*^9, 3.598961072463497*^9}, {3.59896113264111*^9, 
+   3.59896113279837*^9}, {3.59896157178162*^9, 3.59896157238104*^9}, {
+   3.5989616432597723`*^9, 3.598961752423936*^9}, {3.5989653068509617`*^9, 
+   3.598965342344088*^9}, {3.598965381336091*^9, 3.5989654243283663`*^9}, {
+   3.5989656844513283`*^9, 3.598965685703039*^9}, {3.5989658738608217`*^9, 
+   3.598966008995018*^9}, {3.598966048259377*^9, 3.598966099828245*^9}, {
+   3.598966171087788*^9, 3.5989663631354427`*^9}, {3.5989665393042707`*^9, 
+   3.598966638953883*^9}, {3.598966984300712*^9, 3.598967027817153*^9}, {
+   3.598967211282138*^9, 3.598967288405199*^9}, {3.5989673393289537`*^9, 
+   3.598967357312009*^9}, {3.5989678122106028`*^9, 3.598967816012473*^9}, {
+   3.59896925255449*^9, 3.598969256167766*^9}, {3.5989693573851137`*^9, 
+   3.5989693778888283`*^9}, {3.5989749692530613`*^9, 3.598974970996973*^9}, {
+   3.598975313216591*^9, 3.5989753338071337`*^9}, {3.598979913947002*^9, 
+   3.598979938886961*^9}, 3.598986498985298*^9, 3.598986644738042*^9, 
+   3.598986675785254*^9, {3.5989867703338842`*^9, 3.59898688109562*^9}, {
+   3.598987375406089*^9, 3.59898738227494*^9}, {3.5989874431909657`*^9, 
+   3.598987443685081*^9}, {3.598987478020443*^9, 3.5989875229151373`*^9}, {
+   3.598987706640746*^9, 3.5989877074060307`*^9}, {3.59898774375038*^9, 
+   3.598987840508101*^9}, {3.599206933256179*^9, 3.59920693693985*^9}, {
+   3.599313051897978*^9, 3.5993131778169727`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Generowanie", " ", "i", " ", "manipulowanie", " ", "GARCH", 
+    RowBox[{"(", 
+     RowBox[{"p", ",", "q"}], ")"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"GARCH", "[", 
+    RowBox[{"p_Integer", ",", " ", "q_Integer"}], "]"}], ":=", 
+   RowBox[{"Block", "[", "\[IndentingNewLine]", "\t", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "w", ",", " ", "A", ",", " ", "B", ",", " ", "n", ",", " ", "d", ",", 
+       " ", "s", ",", " ", "v", ",", " ", "alist", ",", " ", "blist"}], "}"}],
+      ",", "\[IndentingNewLine]", "\t", 
+     RowBox[{
+      RowBox[{"alist", " ", "=", " ", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         SubscriptBox["A", "i"], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", " ", "1", ",", " ", "q", ",", " ", "1"}], "}"}]}],
+         "]"}]}], ";", "\[IndentingNewLine]", "\t", 
+      RowBox[{"blist", " ", "=", " ", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         SubscriptBox["B", "i"], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", " ", "1", ",", " ", "p", ",", " ", "1"}], "}"}]}],
+         "]"}]}], ";", "\[IndentingNewLine]", "\t", 
+      RowBox[{"Manipulate", "@@", 
+       RowBox[{"{", "\[IndentingNewLine]", "\t\t", 
+        RowBox[{
+         RowBox[{"visualizeGarch", "[", 
+          RowBox[{
+          "w", ",", " ", "alist", ",", " ", "blist", ",", " ", "n", ",", " ", 
+           "d", ",", " ", "s", ",", " ", "v"}], "]"}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"w", ",", " ", "0.5", ",", " ", "\"\<\[Omega]\>\""}], 
+            "}"}], ",", " ", "0.01", ",", " ", "2.0"}], "}"}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"Sequence", "@@", 
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{
+                SubscriptBox["A", "i"], ",", " ", "0.2", ",", " ", 
+                SubscriptBox["\"\<a\>\"", "i"]}], "}"}], ",", " ", "0", ",", 
+              " ", "2"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", " ", "q"}], "}"}]}], "]"}]}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"Sequence", "@@", 
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{
+                SubscriptBox["B", "i"], ",", " ", "0.5", ",", " ", 
+                SubscriptBox["\"\<b\>\"", "i"]}], "}"}], ",", " ", "0", ",", 
+              " ", "2"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", " ", "p"}], "}"}]}], "]"}]}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "n", ",", " ", "30", ",", " ", 
+             "\"\<D\[LSlash]ugo\:015b\[CAcute]\>\""}], "}"}], ",", " ", "20", 
+           ",", " ", "300", ",", " ", "1"}], "}"}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"d", ",", " ", "100", ",", " ", "\"\<Obci\:0119cie\>\""}],
+             "}"}], ",", " ", "50", ",", " ", "300", ",", " ", "1"}], "}"}], 
+         ",", "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"s", ",", " ", "761", ",", " ", "\"\<Ziarno\>\""}], "}"}],
+            ",", " ", "100", ",", " ", "10000", ",", " ", "1"}], "}"}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "v", ",", " ", "\"\<garch\>\"", ",", " ", "\"\<Widok\>\""}], 
+            "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<garch\>\"", ",", " ", "\"\<histogram\>\"", ",", " ", 
+             "\"\<f.autokorelacji\>\"", ",", " ", 
+             "\"\<f.autokorelacji \[Sigma]\>\""}], "}"}]}], "}"}]}], 
+        "\[IndentingNewLine]", "\t", "}"}]}]}]}], "\[IndentingNewLine]", 
+    "]"}]}]}]], "Code",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.5989745725337887`*^9, 3.5989749291610413`*^9}, {
+   3.598975175727647*^9, 3.598975192523521*^9}, {3.5989753645547857`*^9, 
+   3.598975371333667*^9}, 3.598986498985485*^9, 3.5989866447399483`*^9, {
+   3.598986722630752*^9, 3.5989867536061172`*^9}, {3.598987846298843*^9, 
+   3.598987937943852*^9}, {3.5990667500436897`*^9, 3.599066750339756*^9}, {
+   3.599313107364697*^9, 3.599313111611945*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Dynamiczny", " ", "przyk\[LSlash]ad", " ", "metody", " ", 
+    RowBox[{"GARCH", "[", "]"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"GARCH", "[", 
+   RowBox[{"1", ",", "2"}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.598974868015356*^9, 3.598974869955853*^9}, {
+  3.59897494391591*^9, 3.598974943995212*^9}, {3.598974985983902*^9, 
+  3.598974986110724*^9}, {3.598975026068132*^9, 3.598975028131487*^9}, {
+  3.598975196790338*^9, 3.59897523939258*^9}, {3.599052154233033*^9, 
+  3.59905215428267*^9}, {3.599313240039283*^9, 3.599313252051609*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`d$$ = 153, $CellContext`n$$ = 
+    30, $CellContext`s$$ = 5921, $CellContext`v$$ = 
+    "garch", $CellContext`w$$ = 0.8300000000000001, $CellContext`$13$$ = 
+    1.31, $CellContext`$14$$ = 1.4000000000000001`, $CellContext`$15$$ = 1.35,
+     Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`w$$], 0.5, "\[Omega]"}, 0.01, 2.}, {{
+       Hold[$CellContext`$13$$], 0.2, 
+       Subscript["a", 1]}, 0, 2}, {{
+       Hold[$CellContext`$14$$], 0.2, 
+       Subscript["a", 2]}, 0, 2}, {{
+       Hold[$CellContext`$15$$], 0.5, 
+       Subscript["b", 1]}, 0, 2}, {{
+       Hold[$CellContext`n$$], 30, "D\[LSlash]ugo\:015b\[CAcute]"}, 20, 300, 
+      1}, {{
+       Hold[$CellContext`d$$], 100, "Obci\:0119cie"}, 50, 300, 1}, {{
+       Hold[$CellContext`s$$], 761, "Ziarno"}, 100, 10000, 1}, {{
+       Hold[$CellContext`v$$], "garch", "Widok"}, {
+      "garch", "histogram", "f.autokorelacji", "f.autokorelacji \[Sigma]"}}}, 
+    Typeset`size$$ = {346., {100., 104.}}, Typeset`update$$ = 0, 
+    Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    True, $CellContext`w$24770$$ = 0, $CellContext`$13$24771$$ = 
+    0, $CellContext`$14$24772$$ = 0, $CellContext`$15$24773$$ = 
+    0, $CellContext`n$24774$$ = 0, $CellContext`d$24775$$ = 
+    0, $CellContext`s$24776$$ = 0, $CellContext`v$24777$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`d$$ = 100, $CellContext`n$$ = 
+        30, $CellContext`s$$ = 761, $CellContext`v$$ = 
+        "garch", $CellContext`w$$ = 0.5, $CellContext`$13$$ = 
+        0.2, $CellContext`$14$$ = 0.2, $CellContext`$15$$ = 0.5}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`w$$, $CellContext`w$24770$$, 0], 
+        Hold[$CellContext`$13$$, $CellContext`$13$24771$$, 0], 
+        Hold[$CellContext`$14$$, $CellContext`$14$24772$$, 0], 
+        Hold[$CellContext`$15$$, $CellContext`$15$24773$$, 0], 
+        Hold[$CellContext`n$$, $CellContext`n$24774$$, 0], 
+        Hold[$CellContext`d$$, $CellContext`d$24775$$, 0], 
+        Hold[$CellContext`s$$, $CellContext`s$24776$$, 0], 
+        Hold[$CellContext`v$$, $CellContext`v$24777$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, 
+      "Body" :> $CellContext`visualizeGarch[$CellContext`w$$, \
+{$CellContext`$13$$, $CellContext`$14$$}, {$CellContext`$15$$}, \
+$CellContext`n$$, $CellContext`d$$, $CellContext`s$$, $CellContext`v$$], 
+      "Specifications" :> {{{$CellContext`w$$, 0.5, "\[Omega]"}, 0.01, 
+         2.}, {{$CellContext`$13$$, 0.2, 
+          Subscript["a", 1]}, 0, 2}, {{$CellContext`$14$$, 0.2, 
+          Subscript["a", 2]}, 0, 2}, {{$CellContext`$15$$, 0.5, 
+          Subscript["b", 1]}, 0, 
+         2}, {{$CellContext`n$$, 30, "D\[LSlash]ugo\:015b\[CAcute]"}, 20, 300,
+          1}, {{$CellContext`d$$, 100, "Obci\:0119cie"}, 50, 300, 
+         1}, {{$CellContext`s$$, 761, "Ziarno"}, 100, 10000, 
+         1}, {{$CellContext`v$$, "garch", "Widok"}, {
+         "garch", "histogram", "f.autokorelacji", 
+          "f.autokorelacji \[Sigma]"}}}, "Options" :> {}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{687., {132., 138.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.599052154926193*^9, 3.59931318577032*^9, {3.599313241377932*^9, 
+   3.599313252907988*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "Fitowanie", " ", "metod\:0105", " ", "najwi\:0119kszej", " ", "log"}], 
+    "-", "wiarogodno\:015bci", " ", "-", " ", 
+    RowBox[{"tylko", " ", "GARCH", 
+     RowBox[{"(", 
+      RowBox[{"1", ",", "1"}], ")"}]}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"dataToFit", " ", "=", " ", 
+    RowBox[{"garchSeries", "[", 
+     RowBox[{"0.1", ",", " ", 
+      RowBox[{"{", "0.9", "}"}], ",", " ", 
+      RowBox[{"{", "0.2", "}"}], ",", " ", "100", ",", " ", "100", ",", " ", 
+      "4782"}], "]"}]}], ";"}]}]], "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.599052593800008*^9, 3.5990526084554977`*^9}, {
+   3.599052857134283*^9, 3.599052863221366*^9}, 3.599052931906434*^9, {
+   3.599053165409954*^9, 3.599053166247444*^9}, {3.599057569390341*^9, 
+   3.599057591111367*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Fit", " ", "to", " ", "GARCH", 
+    RowBox[{"(", 
+     RowBox[{"1", ",", "1"}], ")"}]}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{"L", "[", 
+    RowBox[{"data_List", ",", " ", "w_", ",", " ", "a_", ",", " ", "b_"}], 
+    "]"}], " ", ":=", "\n", 
+   RowBox[{"Module", "[", "\n", "\t", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"n", " ", "=", " ", 
+        RowBox[{"Length", "[", "data", "]"}]}], ",", " ", "tmp", ",", " ", 
+       "sigma"}], "}"}], ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"sigma", " ", "=", " ", 
+       SqrtBox["w"]}], ";", "\n", "\t", 
+      RowBox[{"tmp", " ", "=", " ", 
+       RowBox[{"-", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Log", "[", "w", "]"}], " ", "+", " ", 
+          FractionBox[
+           SuperscriptBox[
+            RowBox[{"data", "[", 
+             RowBox[{"[", "1", "]"}], "]"}], "2"], "w"]}], ")"}]}]}], ";", 
+      "\n", "\t", 
+      RowBox[{"For", "[", 
+       RowBox[{
+        RowBox[{"i", " ", "=", " ", "2"}], ",", " ", 
+        RowBox[{"i", " ", "\[LessEqual]", " ", "n"}], ",", " ", 
+        RowBox[{"i", "++"}], ",", "\n", "\t\t", 
+        RowBox[{
+         RowBox[{"sigma", " ", "=", " ", 
+          SqrtBox[
+           RowBox[{"w", " ", "+", " ", 
+            RowBox[{"a", " ", 
+             SuperscriptBox[
+              RowBox[{"data", "[", 
+               RowBox[{"[", 
+                RowBox[{"i", "-", "1"}], "]"}], "]"}], "2"]}], " ", "+", " ", 
+            
+            RowBox[{"b", " ", 
+             SuperscriptBox["sigma", "2"]}]}]]}], ";", "\n", "\t\t", 
+         RowBox[{"tmp", " ", "+=", " ", 
+          RowBox[{"-", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"Log", "[", 
+              SuperscriptBox["sigma", "2"], "]"}], " ", "+", " ", 
+             FractionBox[
+              SuperscriptBox[
+               RowBox[{"data", "[", 
+                RowBox[{"[", "i", "]"}], "]"}], "2"], 
+              SuperscriptBox["sigma", "2"]]}], ")"}]}]}], ";"}]}], "\n", "\t",
+        "]"}], ";", "\n", "\t", 
+      RowBox[{"Return", "[", "tmp", "]"}]}]}], "\n", "]"}]}]}]], "Code",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.599052227822852*^9, 3.599052563144957*^9}, {
+   3.5990570967909937`*^9, 3.599057211553163*^9}, {3.599057321541589*^9, 
+   3.5990573294433107`*^9}, 3.5990575693904953`*^9, {3.599743713126227*^9, 
+   3.599743713949745*^9}, {3.599743760350325*^9, 3.599743957448763*^9}, {
+   3.5997441775526447`*^9, 3.599744281478166*^9}, 3.599744396444162*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FindMaximum", "[", 
+   RowBox[{
+    RowBox[{"{", "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"L", "[", 
+       RowBox[{"dataToFit", ",", " ", "w", ",", " ", "a", ",", " ", "b"}], 
+       "]"}], ",", "\[IndentingNewLine]", "\t\t", 
+      RowBox[{
+       RowBox[{"0.0", " ", "<", " ", "w", " ", "<", " ", "0.7"}], " ", "&&", 
+       " ", 
+       RowBox[{"0.5", " ", "<", " ", "a", " ", "<", " ", "1.0"}], " ", "&&", 
+       " ", 
+       RowBox[{"0.0", " ", "<", " ", "b", " ", "<", " ", "0.3"}]}]}], "\n", 
+     "\t", "}"}], ",", "\n", "\t", 
+    RowBox[{"{", 
+     RowBox[{"w", ",", " ", "0.1"}], "}"}], ",", "\n", "\t", 
+    RowBox[{"{", 
+     RowBox[{"a", ",", " ", "0.6"}], "}"}], ",", "\n", "\t", 
+    RowBox[{"{", 
+     RowBox[{"b", ",", " ", "0.1"}], "}"}]}], "\n", "]"}], "//", 
+  "Timing"}]], "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.599052544685899*^9, 3.5990525668660316`*^9}, {
+   3.599052603704379*^9, 3.5990527649811068`*^9}, {3.599052805669351*^9, 
+   3.599052808179928*^9}, {3.599052890814204*^9, 3.599052894821352*^9}, {
+   3.5990532472477922`*^9, 3.599053247552106*^9}, {3.5990570187781353`*^9, 
+   3.59905702033524*^9}, 3.599057569390572*^9, {3.599057640590612*^9, 
+   3.599057745418167*^9}, {3.599206210165223*^9, 3.599206211063457*^9}}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "592.4070550000000139334588311612606048584`8.793220135190452", ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "85.24720664313524`"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"w", "\[Rule]", "0.10586018676605737`"}], ",", 
+       RowBox[{"a", "\[Rule]", "0.9999999995188613`"}], ",", 
+       RowBox[{"b", "\[Rule]", "2.0617369992029563`*^-10"}]}], "}"}]}], 
+    "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.599749821777566*^9}]
+},
+WindowSize->{807, 687},
+WindowMargins->{{19, Automatic}, {Automatic, 16}},
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (November 20, \
+2012)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 1613, 52, 130, "Text"],
+Cell[CellGroupData[{
+Cell[2195, 76, 252, 4, 46, "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[2450, 82, 14710, 337, 1223, "Code",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[17163, 421, 4628, 110, 288, "Code",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21828, 536, 601, 11, 46, "Input"],
+Cell[22432, 549, 4009, 76, 287, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[26478, 630, 892, 21, 46, "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[27373, 653, 2573, 65, 334, "Code",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[29949, 720, 1332, 29, 148, "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}]
+}, Open  ]],
+Cell[31296, 752, 493, 13, 35, "Output"]
+}
+]
+*)
+
+(* End of internal cache information *)
